@@ -8,6 +8,7 @@ def update():
     count = history["count"]
 
     lines = []
+
     lines.append("# Islamic Quote Posters\n")
 
     for i in range(count,0,-1):
@@ -15,3 +16,6 @@ def update():
 
     with open("README.md","w") as f:
         f.write("\n".join(lines))
+
+if __name__=="__main__":
+    update()
