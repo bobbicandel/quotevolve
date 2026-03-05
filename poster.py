@@ -28,48 +28,54 @@ def render(background, quote, ref, index):
     img = background.resize((W, H))
     draw = ImageDraw.Draw(img)
 
-    fontquote = loadfont(64)   # font utama
-    fontref = loadfont(34)     # referensi ayat kecil
+    # FONT LEBIH KECIL
+    fontquote = loadfont(48)
+    fontref = loadfont(28)
 
-    # wrap quote
-    lines = textwrap.wrap(quote, width=28)
+    # WRAP TEXT
+    lines = textwrap.wrap(quote, width=32)
 
-    if len(lines) > 3:
-        lines = lines[:3]
+    # BATASI MAX 2 BARIS
+    if len(lines) > 2:
+        lines = lines[:2]
 
-    lineheight = 80
+    lineheight = 70
     totalheight = len(lines) * lineheight
 
     y = H//2 - totalheight//2
 
+    # WARNA KHaki LEMBUT
+    textcolor = (195, 176, 145)
+    shadow = (0, 0, 0)
+
     for line in lines:
 
-        # shadow
+        # shadow halus
         draw.text(
             (W//2+2, y+2),
             line,
             font=fontquote,
-            fill=(0,0,0),
+            fill=shadow,
             anchor="mm"
         )
 
-        # glow
+        # main text
         draw.text(
             (W//2, y),
             line,
             font=fontquote,
-            fill=(255,255,255),
+            fill=textcolor,
             anchor="mm"
         )
 
         y += lineheight
 
-    # reference ayat / hadits
+    # SOURCE / AYAT DI BAWAH
     draw.text(
-        (W//2, y+30),
+        (W//2, y + 60),
         ref,
         font=fontref,
-        fill=(255,215,120),
+        fill=(170,150,120),
         anchor="mm"
     )
 
