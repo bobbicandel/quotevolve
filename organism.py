@@ -1,161 +1,109 @@
 import random
-import math
-import textwrap
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
-
-WIDTH = 1200
-HEIGHT = 1200
-
-DATA = [
-("Sesungguhnya bersama kesulitan ada kemudahan","QS Al-Insyirah 5-6"),
-("Allah tidak membebani seseorang melainkan sesuai kesanggupannya","QS Al-Baqarah 286"),
-("Janganlah berputus asa dari rahmat Allah","QS Az-Zumar 53"),
-("Sebaik-baik manusia adalah yang paling bermanfaat bagi manusia","HR Bukhari"),
-("Allah itu indah dan menyukai keindahan","HR Muslim"),
-("Bertakwalah kepada Allah di mana pun kamu berada","HR Tirmidzi"),
-]
-
-def nebula():
-
-    img = Image.new("RGB",(WIDTH,HEIGHT))
-    px = img.load()
-
-    seed=random.random()*10
-
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
-
-            v=(
-                math.sin(x*0.012+seed)+
-                math.sin(y*0.018+seed)+
-                math.sin((x+y)*0.009)+
-                math.sin(math.sqrt(x*x+y*y)*0.02)
-            )
-
-            v=(v+4)/8
-
-            r=int(30+v*150)
-            g=int(40+v*100)
-            b=int(120+v*140)
-
-            px[x,y]=(r,g,b)
-
-    img=img.filter(ImageFilter.GaussianBlur(5))
-
-    return img
+import numpy as np
+from PIL import Image, ImageFilter
 
 
-def glow(img):
-
-    layer=Image.new("RGBA",(WIDTH,HEIGHT),(0,0,0,0))
-    d=ImageDraw.Draw(layer)
-
-    for _ in range(6):
-
-        x=random.randint(0,WIDTH)
-        y=random.randint(0,HEIGHT)
-        r=random.randint(200,400)
-
-        d.ellipse(
-            (x-r,y-r,x+r,y+r),
-            fill=(255,200,150,40)
-        )
-
-    layer=layer.filter(ImageFilter.GaussianBlur(140))
-
-    img=Image.alpha_composite(img.convert("RGBA"),layer)
-
-    return img.convert("RGB")
+W = 1200
+H = 1200
 
 
-def card(img):
+def cosmic_gradient():
 
-    overlay=Image.new("RGBA",(WIDTH,HEIGHT),(0,0,0,0))
-    d=ImageDraw.Draw(overlay)
+    base = np.zeros((H, W, 3), dtype=np.float32)
 
-    margin=180
+    c1 = np.array([
+        random.randint(20,60),
+        random.randint(40,90),
+        random.randint(80,160)
+    ])
 
-    d.rounded_rectangle(
-        (margin,margin,WIDTH-margin,HEIGHT-margin),
-        radius=60,
-        fill=(0,0,0,170)
-    )
+    c2 = np.array([
+        random.randint(120,180),
+        random.randint(80,140),
+        random.randint(60,120)
+    ])
 
-    img=Image.alpha_composite(img.convert("RGBA"),overlay)
+    for y in range(H):
 
-    return img.convert("RGB")
+        t = y / H
+
+        color = (1-t)*c1 + t*c2
+
+        base[y,:,:] = color
+
+    return base
 
 
-def drawquote(img,quote,source):
+def grain_texture(img):
 
-    draw=ImageDraw.Draw(img)
+    noise = np.random.normal(0, 8, (H, W, 3))
 
-    # auto font scaling
-    if len(quote) > 80:
-        size=58
-        wrap=26
-    elif len(quote) > 50:
-        size=64
-        wrap=24
-    else:
-        size=72
-        wrap=22
+    img = img + noise
 
-    font_big=ImageFont.truetype("DejaVuSans-Bold.ttf",size)
-    font_small=ImageFont.truetype("DejaVuSans.ttf",38)
+    return np.clip(img,0,255)
 
-    wrapped=textwrap.fill(quote,width=wrap)
 
-    w,h=draw.multiline_textbbox((0,0),wrapped,font=font_big,spacing=16)[2:]
+def fractal_light(img):
 
-    x=(WIDTH-w)/2
-    y=(HEIGHT-h)/2-50
+    for _ in range(8):
 
-    # shadow stroke
-    for dx in [-2,-1,1,2]:
-        for dy in [-2,-1,1,2]:
+        cx = random.randint(0, W)
+        cy = random.randint(0, H)
 
-            draw.multiline_text(
-                (x+dx,y+dy),
-                wrapped,
-                font=font_big,
-                fill=(0,0,0),
-                align="center",
-                spacing=16
-            )
+        radius = random.randint(150,400)
 
-    draw.multiline_text(
-        (x,y),
-        wrapped,
-        font=font_big,
-        fill=(255,255,255),
-        align="center",
-        spacing=16
-    )
+        for y in range(H):
 
-    sw,sh=draw.textbbox((0,0),source,font=font_small)[2:]
+            for x in range(W):
 
-    sx=(WIDTH-sw)/2
-    sy=y+h+40
+                dx = x - cx
+                dy = y - cy
 
-    draw.text(
-        (sx,sy),
-        source,
-        font=font_small,
-        fill=(255,215,120)
-    )
+                d = (dx*dx + dy*dy)**0.5
+
+                if d < radius:
+
+                    glow = (1 - d/radius) * 40
+
+                    img[y,x] += glow
+
+    return np.clip(img,0,255)
+
+
+def vignette(img):
+
+    cx = W/2
+    cy = H/2
+
+    maxd = (cx**2 + cy**2)**0.5
+
+    for y in range(H):
+
+        for x in range(W):
+
+            d = ((x-cx)**2 + (y-cy)**2)**0.5
+
+            v = d / maxd
+
+            img[y,x] *= (1 - v*0.35)
+
+    return np.clip(img,0,255)
 
 
 def generate():
 
-    quote,source=random.choice(DATA)
+    img = cosmic_gradient()
 
-    img=nebula()
+    img = grain_texture(img)
 
-    img=glow(img)
+    img = fractal_light(img)
 
-    img=card(img)
+    img = vignette(img)
 
-    drawquote(img,quote,source)
+    img = img.astype("uint8")
 
-    return img
+    im = Image.fromarray(img)
+
+    im = im.filter(ImageFilter.SMOOTH)
+
+    return im
