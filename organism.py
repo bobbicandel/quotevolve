@@ -4,42 +4,33 @@ import random
 
 SIZE = 1200
 
-def plasma():
+def fractal():
 
-    w = SIZE
-    h = SIZE
+    x = np.linspace(-2,2,SIZE)
+    y = np.linspace(-2,2,SIZE)
 
-    data = np.zeros((h, w))
+    X,Y = np.meshgrid(x,y)
 
-    scale = random.uniform(1.5,4)
+    Z = (
+        np.sin(X*3)
+        + np.cos(Y*3)
+        + np.sin((X**2+Y**2)*4)
+        + np.cos((X**2-Y**2)*2)
+    )
 
-    for y in range(h):
-        for x in range(w):
+    Z = (Z - Z.min())/(Z.max()-Z.min())
 
-            nx = x/w - 0.5
-            ny = y/h - 0.5
-
-            v = (
-                np.sin(nx*scale*10)
-                + np.cos(ny*scale*10)
-                + np.sin((nx*nx+ny*ny)*scale*20)
-            )
-
-            data[y,x] = v
-
-    data = (data - data.min())/(data.max()-data.min())
-
-    return data
+    return Z
 
 
 def palette():
 
     palettes = [
-        ((0,255,255),(255,0,255),(0,0,255)),
-        ((255,140,0),(255,0,150),(0,0,0)),
-        ((0,255,120),(0,60,255),(0,0,0)),
-        ((255,0,80),(255,220,0),(20,20,20)),
-        ((0,200,255),(255,0,120),(10,10,30))
+        ((0,255,255),(255,0,200)),
+        ((255,80,0),(255,220,0)),
+        ((0,200,255),(120,0,255)),
+        ((0,255,120),(0,60,255)),
+        ((255,0,120),(255,255,0))
     ]
 
     return random.choice(palettes)
@@ -47,13 +38,13 @@ def palette():
 
 def generate():
 
-    p = plasma()
+    Z = fractal()
 
-    c1,c2,c3 = palette()
+    c1,c2 = palette()
 
-    r = (p*c1[0] + (1-p)*c2[0]).astype(np.uint8)
-    g = (p*c1[1] + (1-p)*c2[1]).astype(np.uint8)
-    b = (p*c1[2] + (1-p)*c3[2]).astype(np.uint8)
+    r = (Z*c1[0] + (1-Z)*c2[0]).astype(np.uint8)
+    g = (Z*c1[1] + (1-Z)*c2[1]).astype(np.uint8)
+    b = (Z*c1[2] + (1-Z)*c2[2]).astype(np.uint8)
 
     img = np.stack([r,g,b],axis=2)
 
