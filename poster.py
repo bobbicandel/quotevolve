@@ -1,132 +1,84 @@
-from PIL import Image, ImageDraw, ImageFont
-import numpy as np
 import os
+import textwrap
+from PIL import Image, ImageDraw, ImageFont
 
-SIZE = 1200
-SAFE = 200
+W = 1200
+H = 1200
 
 
 def loadfont(size):
 
     paths = [
-        "fonts/poppins.ttf",
-        "fonts/montserrat.ttf",
-        "fonts/playfair.ttf"
+        "fonts/PlayfairDisplay-Bold.ttf",
+        "fonts/Merriweather-Bold.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf"
     ]
 
     for p in paths:
         if os.path.exists(p):
-            return ImageFont.truetype(p,size)
+            return ImageFont.truetype(p, size)
 
     return ImageFont.load_default()
 
 
-def wrap(draw,text,font,maxwidth):
+def render(background, quote, ref, index):
 
-    words=text.split()
+    os.makedirs("poster", exist_ok=True)
 
-    lines=[]
-    line=""
-
-    for w in words:
-
-        test=line+" "+w if line else w
-
-        box=draw.textbbox((0,0),test,font=font)
-
-        if box[2] <= maxwidth:
-            line=test
-        else:
-            lines.append(line)
-            line=w
-
-    if line:
-        lines.append(line)
-
-    return lines
-
-
-def autofont(draw,text):
-
-    for size in range(90,40,-4):
-
-        font=loadfont(size)
-
-        lines=wrap(draw,text,font,SIZE-SAFE*2)
-
-        h=len(lines)*size*1.4
-
-        if h < SIZE*0.55:
-            return font,lines
-
-    font=loadfont(48)
-
-    return font,wrap(draw,text,font,SIZE-SAFE*2)
-
-
-def brightness(img):
-
-    arr=np.array(img.convert("L"))
-
-    return arr.mean()
-
-
-def textcolor(bg):
-
-    b=brightness(bg)
-
-    if b < 120:
-        return (255,255,255)
-
-    return (20,20,20)
-
-
-def render(bg,quote,source):
-
-    img = bg.resize((SIZE,SIZE)).convert("RGB")
-
+    img = background.resize((W, H))
     draw = ImageDraw.Draw(img)
 
-    font,lines = autofont(draw,quote)
+    fontquote = loadfont(64)   # font utama
+    fontref = loadfont(34)     # referensi ayat kecil
 
-    spacing = int(font.size * 1.35)
+    # wrap quote
+    lines = textwrap.wrap(quote, width=28)
 
-    textheight = len(lines)*spacing
+    if len(lines) > 3:
+        lines = lines[:3]
 
-    y = (SIZE-textheight)/2
+    lineheight = 80
+    totalheight = len(lines) * lineheight
 
-    color=textcolor(bg)
+    y = H//2 - totalheight//2
 
     for line in lines:
 
-        box = draw.textbbox((0,0),line,font=font)
-
-        w = box[2]
-
-        x = (SIZE-w)/2
-
+        # shadow
         draw.text(
-            (x,y),
+            (W//2+2, y+2),
             line,
-            font=font,
-            fill=color,
-            stroke_width=3,
-            stroke_fill=(0,0,0)
+            font=fontquote,
+            fill=(0,0,0),
+            anchor="mm"
         )
 
-        y += spacing
+        # glow
+        draw.text(
+            (W//2, y),
+            line,
+            font=fontquote,
+            fill=(255,255,255),
+            anchor="mm"
+        )
 
-    small = loadfont(36)
+        y += lineheight
 
-    box = draw.textbbox((0,0),source,font=small)
-
-    w = box[2]
-
+    # reference ayat / hadits
     draw.text(
-        ((SIZE-w)/2,y+40),
-        source,
-        font=small,
-        fill=(255,215,0)
+        (W//2, y+30),
+        ref,
+        font=fontref,
+        fill=(255,215,120),
+        anchor="mm"
     )
 
-    return img
+    path = f"poster/{index}.png"
+
+    img.save(
+        path,
+        "PNG",
+        optimize=True
+    )
+
+    return path
