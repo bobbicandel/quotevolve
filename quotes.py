@@ -1,48 +1,46 @@
 import random
 
-QUOTES = [
-
-{
-"text":"Sesungguhnya bersama kesulitan ada kemudahan.",
-"source":"QS Al-Insyirah 5-6"
-},
-
-{
-"text":"Allah tidak membebani seseorang melainkan sesuai kesanggupannya.",
-"source":"QS Al-Baqarah 286"
-},
-
-{
-"text":"Janganlah berputus asa dari rahmat Allah.",
-"source":"QS Az-Zumar 53"
-},
-
-{
-"text":"Sebaik-baik manusia adalah yang paling bermanfaat bagi manusia.",
-"source":"HR Bukhari"
-},
-
-{
-"text":"Allah itu indah dan menyukai keindahan.",
-"source":"HR Muslim"
-},
-
-{
-"text":"Bertakwalah kepada Allah di mana pun kamu berada.",
-"source":"HR Tirmidzi"
-},
-
-{
-"text":"Barangsiapa memudahkan urusan orang lain, Allah akan memudahkan urusannya.",
-"source":"HR Muslim"
-},
-
-{
-"text":"Sesungguhnya Allah bersama orang-orang yang sabar.",
-"source":"QS Al-Baqarah 153"
-}
-
+DATA = [
+    (
+        "Sesungguhnya bersama kesulitan ada kemudahan.",
+        "QS Al-Insyirah 5-6"
+    ),
+    (
+        "Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.",
+        "QS Al-Baqarah 286"
+    ),
+    (
+        "Janganlah berputus asa dari rahmat Allah.",
+        "QS Az-Zumar 53"
+    ),
+    (
+        "Sesungguhnya Allah bersama orang-orang yang sabar.",
+        "QS Al-Baqarah 153"
+    ),
+    (
+        "Dan barang siapa bertawakal kepada Allah, niscaya Allah akan mencukupkan keperluannya.",
+        "QS At-Talaq 3"
+    ),
+    (
+        "Sebaik-baik manusia adalah yang paling bermanfaat bagi manusia.",
+        "HR Bukhari"
+    ),
+    (
+        "Allah itu indah dan menyukai keindahan.",
+        "HR Muslim"
+    ),
+    (
+        "Bertakwalah kepada Allah di mana pun kamu berada.",
+        "HR Tirmidzi"
+    ),
+    (
+        "Permudahlah dan jangan mempersulit.",
+        "HR Bukhari Muslim"
+    ),
 ]
 
+
 def get():
-    return random.choice(QUOTES)
+    quote, ref = random.choice(DATA)
+
+    return quote, ref
