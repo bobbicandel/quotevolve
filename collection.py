@@ -7,14 +7,9 @@ import quotes
 
 def run():
 
-    if not os.path.exists("art"):
-        os.mkdir("art")
-
-    if not os.path.exists("poster"):
-        os.mkdir("poster")
-
-    if not os.path.exists("stats"):
-        os.mkdir("stats")
+    os.makedirs("art",exist_ok=True)
+    os.makedirs("poster",exist_ok=True)
+    os.makedirs("stats",exist_ok=True)
 
     with open("history.json") as f:
         history = json.load(f)
@@ -31,11 +26,14 @@ def run():
     bg.save(artpath)
 
     img = poster.render(bg,q["text"],q["source"])
-    img.save(posterpath)
+    img.save(posterpath,optimize=True)
 
     history["count"] = count
 
     with open("history.json","w") as f:
         json.dump(history,f)
 
-    return count
+    print("generated",count)
+
+if __name__=="__main__":
+    run()
