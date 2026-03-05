@@ -1,25 +1,59 @@
 import numpy as np
 from PIL import Image
 import random
-import os
 
 SIZE = 1200
 
+def plasma():
+
+    w = SIZE
+    h = SIZE
+
+    data = np.zeros((h, w))
+
+    scale = random.uniform(1.5,4)
+
+    for y in range(h):
+        for x in range(w):
+
+            nx = x/w - 0.5
+            ny = y/h - 0.5
+
+            v = (
+                np.sin(nx*scale*10)
+                + np.cos(ny*scale*10)
+                + np.sin((nx*nx+ny*ny)*scale*20)
+            )
+
+            data[y,x] = v
+
+    data = (data - data.min())/(data.max()-data.min())
+
+    return data
+
+
+def palette():
+
+    palettes = [
+        ((0,255,255),(255,0,255),(0,0,255)),
+        ((255,140,0),(255,0,150),(0,0,0)),
+        ((0,255,120),(0,60,255),(0,0,0)),
+        ((255,0,80),(255,220,0),(20,20,20)),
+        ((0,200,255),(255,0,120),(10,10,30))
+    ]
+
+    return random.choice(palettes)
+
+
 def generate():
 
-    x = np.linspace(-3,3,SIZE)
-    y = np.linspace(-3,3,SIZE)
+    p = plasma()
 
-    X,Y = np.meshgrid(x,y)
+    c1,c2,c3 = palette()
 
-    Z = np.sin(X*random.uniform(2,6)) + np.cos(Y*random.uniform(2,6))
-    Z += np.sin((X**2+Y**2)*random.uniform(0.5,2))
-
-    Z = (Z - Z.min())/(Z.max()-Z.min())
-
-    r = (np.sin(Z*3.14)*255).astype(np.uint8)
-    g = (np.cos(Z*3.14)*255).astype(np.uint8)
-    b = (np.sin(Z*6.28)*255).astype(np.uint8)
+    r = (p*c1[0] + (1-p)*c2[0]).astype(np.uint8)
+    g = (p*c1[1] + (1-p)*c2[1]).astype(np.uint8)
+    b = (p*c1[2] + (1-p)*c3[2]).astype(np.uint8)
 
     img = np.stack([r,g,b],axis=2)
 
