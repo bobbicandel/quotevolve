@@ -13,17 +13,22 @@ jobs:
 
     steps:
 
-      - name: checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: setup
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: install
         run: |
-          pip install numpy pillow
+          pip install numpy pillow requests
+
+      - name: fonts
+        run: |
+          mkdir -p fonts
+          curl -L -o fonts/poppins.ttf https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf
+          curl -L -o fonts/montserrat.ttf https://github.com/google/fonts/raw/main/ofl/montserrat/Montserrat-Bold.ttf
+          curl -L -o fonts/playfair.ttf https://github.com/google/fonts/raw/main/ofl/playfairdisplay/PlayfairDisplay-Bold.ttf
 
       - name: run
         run: |
@@ -39,6 +44,7 @@ jobs:
           git add poster/*.png || true
           git add history.json
           git add README.md
+          git add fonts || true
 
           git commit -m "generate poster" || echo "nothing to commit"
           git push
