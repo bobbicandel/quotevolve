@@ -1,43 +1,22 @@
-from PIL import Image,ImageDraw,ImageFont,ImageFilter
+from PIL import Image, ImageDraw, ImageFont
 import numpy as np
-import random
 import os
 
 SIZE = 1200
-SAFE = 180
+SAFE = 200
 
 
-def brightness(img):
+def loadfont(size):
 
-    arr = np.array(img.convert("L"))
-    return arr.mean()
-
-
-def font():
-
-    fonts=[
+    paths = [
         "fonts/poppins.ttf",
         "fonts/montserrat.ttf",
         "fonts/playfair.ttf"
     ]
 
-    for f in fonts:
-        if os.path.exists(f):
-            return ImageFont.truetype(f,72)
-
-    return ImageFont.load_default()
-
-
-def smallfont():
-
-    fonts=[
-        "fonts/poppins.ttf",
-        "fonts/montserrat.ttf"
-    ]
-
-    for f in fonts:
-        if os.path.exists(f):
-            return ImageFont.truetype(f,36)
+    for p in paths:
+        if os.path.exists(p):
+            return ImageFont.truetype(p,size)
 
     return ImageFont.load_default()
 
@@ -64,115 +43,90 @@ def wrap(draw,text,font,maxwidth):
     if line:
         lines.append(line)
 
-    return "\n".join(lines)
+    return lines
 
 
-def choosecolor(bg):
+def autofont(draw,text):
+
+    for size in range(90,40,-4):
+
+        font=loadfont(size)
+
+        lines=wrap(draw,text,font,SIZE-SAFE*2)
+
+        h=len(lines)*size*1.4
+
+        if h < SIZE*0.55:
+            return font,lines
+
+    font=loadfont(48)
+
+    return font,wrap(draw,text,font,SIZE-SAFE*2)
+
+
+def brightness(img):
+
+    arr=np.array(img.convert("L"))
+
+    return arr.mean()
+
+
+def textcolor(bg):
 
     b=brightness(bg)
 
-    if b < 80:
+    if b < 120:
         return (255,255,255)
-
-    if b < 140:
-        return (255,215,0)
 
     return (20,20,20)
 
 
-def glow(draw,x,y,text,font):
+def render(bg,quote,source):
 
-    for g in range(12,0,-2):
-
-        draw.multiline_text(
-            (x-g,y-g),
-            text,
-            font=font,
-            fill=(0,0,0,35),
-            align="center"
-        )
-
-
-def score(img):
-
-    arr=np.array(img.convert("L"))
-
-    contrast=arr.std()
-
-    return contrast
-
-
-def layout(bg,quote,source,mode):
-
-    img = bg.resize((SIZE,SIZE)).convert("RGBA")
-
-    overlay = Image.new("RGBA",(SIZE,SIZE),(0,0,0,110))
-    img = Image.alpha_composite(img,overlay)
+    img = bg.resize((SIZE,SIZE)).convert("RGB")
 
     draw = ImageDraw.Draw(img)
 
-    f=font()
-    sf=smallfont()
+    font,lines = autofont(draw,quote)
 
-    maxwidth=SIZE-SAFE*2
+    spacing = int(font.size * 1.35)
 
-    text=wrap(draw,quote,f,maxwidth)
+    textheight = len(lines)*spacing
 
-    box=draw.multiline_textbbox((0,0),text,font=f)
+    y = (SIZE-textheight)/2
 
-    w=box[2]
-    h=box[3]
+    color=textcolor(bg)
 
-    if mode=="center":
-        y=(SIZE-h)/2
-    elif mode=="top":
-        y=SIZE*0.25
-    else:
-        y=SIZE*0.65-h
+    for line in lines:
 
-    x=(SIZE-w)/2
+        box = draw.textbbox((0,0),line,font=font)
 
-    c=choosecolor(bg)
+        w = box[2]
 
-    glow(draw,x,y,text,f)
+        x = (SIZE-w)/2
 
-    draw.multiline_text(
-        (x,y),
-        text,
-        font=f,
-        fill=c,
-        align="center"
-    )
+        draw.text(
+            (x,y),
+            line,
+            font=font,
+            fill=color,
+            stroke_width=3,
+            stroke_fill=(0,0,0)
+        )
 
-    sw,sh=draw.textbbox((0,0),source,font=sf)[2:]
+        y += spacing
+
+    small = loadfont(36)
+
+    box = draw.textbbox((0,0),source,font=small)
+
+    w = box[2]
 
     draw.text(
-        ((SIZE-sw)/2,y+h+50),
+        ((SIZE-w)/2,y+40),
         source,
-        font=sf,
+        font=small,
         fill=(255,215,0)
     )
 
-    img=img.filter(ImageFilter.SMOOTH)
-
     return img
-
-
-def render(bg,quote,source):
-
-    modes=["center","top","bottom"]
-
-    best=None
-    bestscore=-1
-
-    for m in modes:
-
-        img=layout(bg,quote,source,m)
-
-        s=score(img)
-
-        if s>bestscore:
-            bestscore=s
-            best=img
-
-    return best.convert("RGB")
