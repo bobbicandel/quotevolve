@@ -6,9 +6,9 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 WIDTH = 1200
 HEIGHT = 1200
 
-QUOTES = [
-("Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya","QS Al-Baqarah 286"),
-("Sesungguhnya bersama kesulitan ada kemudahan","QS Al-Insyirah 6"),
+DATA = [
+("Sesungguhnya bersama kesulitan ada kemudahan","QS Al-Insyirah 5-6"),
+("Allah tidak membebani seseorang melainkan sesuai kesanggupannya","QS Al-Baqarah 286"),
 ("Janganlah berputus asa dari rahmat Allah","QS Az-Zumar 53"),
 ("Sebaik-baik manusia adalah yang paling bermanfaat bagi manusia","HR Bukhari"),
 ("Allah itu indah dan menyukai keindahan","HR Muslim"),
@@ -28,15 +28,15 @@ def nebula():
             v=(
                 math.sin(x*0.012+seed)+
                 math.sin(y*0.018+seed)+
-                math.sin((x+y)*0.01)+
+                math.sin((x+y)*0.009)+
                 math.sin(math.sqrt(x*x+y*y)*0.02)
             )
 
             v=(v+4)/8
 
-            r=int(20+v*150)
-            g=int(30+v*90)
-            b=int(120+v*150)
+            r=int(30+v*150)
+            g=int(40+v*100)
+            b=int(120+v*140)
 
             px[x,y]=(r,g,b)
 
@@ -45,47 +45,25 @@ def nebula():
     return img
 
 
-def energy(img):
+def glow(img):
 
     layer=Image.new("RGBA",(WIDTH,HEIGHT),(0,0,0,0))
     d=ImageDraw.Draw(layer)
 
-    for i in range(6):
+    for _ in range(6):
 
         x=random.randint(0,WIDTH)
         y=random.randint(0,HEIGHT)
-        r=random.randint(200,500)
+        r=random.randint(200,400)
 
-        color=random.choice([
-            (255,200,120,40),
-            (120,200,255,40),
-            (255,120,200,40)
-        ])
-
-        d.ellipse((x-r,y-r,x+r,y+r),color)
+        d.ellipse(
+            (x-r,y-r,x+r,y+r),
+            fill=(255,200,150,40)
+        )
 
     layer=layer.filter(ImageFilter.GaussianBlur(140))
 
     img=Image.alpha_composite(img.convert("RGBA"),layer)
-
-    return img.convert("RGB")
-
-
-def vignette(img):
-
-    overlay=Image.new("RGBA",(WIDTH,HEIGHT),(0,0,0,0))
-    d=ImageDraw.Draw(overlay)
-
-    for i in range(400):
-
-        a=int(i*0.45)
-
-        d.rectangle(
-            (i,i,WIDTH-i,HEIGHT-i),
-            outline=(0,0,0,a)
-        )
-
-    img=Image.alpha_composite(img.convert("RGBA"),overlay)
 
     return img.convert("RGB")
 
@@ -95,11 +73,11 @@ def card(img):
     overlay=Image.new("RGBA",(WIDTH,HEIGHT),(0,0,0,0))
     d=ImageDraw.Draw(overlay)
 
-    m=160
+    margin=180
 
     d.rounded_rectangle(
-        (m,m,WIDTH-m,HEIGHT-m),
-        radius=50,
+        (margin,margin,WIDTH-margin,HEIGHT-margin),
+        radius=60,
         fill=(0,0,0,170)
     )
 
@@ -108,23 +86,34 @@ def card(img):
     return img.convert("RGB")
 
 
-def text(img,quote,source):
+def drawquote(img,quote,source):
 
     draw=ImageDraw.Draw(img)
 
-    font_big=ImageFont.truetype("DejaVuSans-Bold.ttf",72)
+    # auto font scaling
+    if len(quote) > 80:
+        size=58
+        wrap=26
+    elif len(quote) > 50:
+        size=64
+        wrap=24
+    else:
+        size=72
+        wrap=22
+
+    font_big=ImageFont.truetype("DejaVuSans-Bold.ttf",size)
     font_small=ImageFont.truetype("DejaVuSans.ttf",38)
 
-    wrapped=textwrap.fill(quote,width=22)
+    wrapped=textwrap.fill(quote,width=wrap)
 
-    w,h=draw.multiline_textbbox((0,0),wrapped,font=font_big)[2:]
+    w,h=draw.multiline_textbbox((0,0),wrapped,font=font_big,spacing=16)[2:]
 
     x=(WIDTH-w)/2
-    y=(HEIGHT-h)/2-60
+    y=(HEIGHT-h)/2-50
 
-    # stroke
-    for dx in [-3,-2,-1,1,2,3]:
-        for dy in [-3,-2,-1,1,2,3]:
+    # shadow stroke
+    for dx in [-2,-1,1,2]:
+        for dy in [-2,-1,1,2]:
 
             draw.multiline_text(
                 (x+dx,y+dy),
@@ -132,7 +121,7 @@ def text(img,quote,source):
                 font=font_big,
                 fill=(0,0,0),
                 align="center",
-                spacing=12
+                spacing=16
             )
 
     draw.multiline_text(
@@ -141,7 +130,7 @@ def text(img,quote,source):
         font=font_big,
         fill=(255,255,255),
         align="center",
-        spacing=12
+        spacing=16
     )
 
     sw,sh=draw.textbbox((0,0),source,font=font_small)[2:]
@@ -156,25 +145,17 @@ def text(img,quote,source):
         fill=(255,215,120)
     )
 
-    draw.line(
-        (WIDTH*0.35,sy+sh+20,WIDTH*0.65,sy+sh+20),
-        fill=(255,215,120),
-        width=4
-    )
-
 
 def generate():
 
-    quote,source=random.choice(QUOTES)
+    quote,source=random.choice(DATA)
 
     img=nebula()
 
-    img=energy(img)
-
-    img=vignette(img)
+    img=glow(img)
 
     img=card(img)
 
-    text(img,quote,source)
+    drawquote(img,quote,source)
 
     return img
