@@ -1,24 +1,45 @@
 from PIL import Image,ImageDraw,ImageFont,ImageFilter
-import textwrap
 
 SIZE = 1200
-
-def wrap(text):
-
-    return "\n".join(textwrap.wrap(text,25))
+SAFE = 200
 
 
-def glow(draw,xy,text,font):
+def wrap(draw,text,font,maxwidth):
 
-    x,y = xy
+    words = text.split()
 
-    for r in range(8,0,-2):
+    lines=[]
+    line=""
 
-        draw.text(
-            (x-r,y-r),
+    for w in words:
+
+        test=line+" "+w if line else w
+
+        box=draw.textbbox((0,0),test,font=font)
+        width=box[2]
+
+        if width<=maxwidth:
+            line=test
+        else:
+            lines.append(line)
+            line=w
+
+    if line:
+        lines.append(line)
+
+    return "\n".join(lines)
+
+
+def glow(draw,x,y,text,font):
+
+    for g in range(8,0,-2):
+
+        draw.multiline_text(
+            (x-g,y-g),
             text,
             font=font,
-            fill=(255,255,255,40)
+            fill=(255,255,255,30),
+            align="center"
         )
 
 
@@ -26,7 +47,7 @@ def render(bg,quote,source):
 
     img = bg.resize((SIZE,SIZE)).convert("RGBA")
 
-    overlay = Image.new("RGBA",(SIZE,SIZE),(0,0,0,120))
+    overlay = Image.new("RGBA",(SIZE,SIZE),(0,0,0,130))
     img = Image.alpha_composite(img,overlay)
 
     draw = ImageDraw.Draw(img)
@@ -38,14 +59,19 @@ def render(bg,quote,source):
         font = ImageFont.load_default()
         small = ImageFont.load_default()
 
-    text = wrap(quote)
+    maxwidth = SIZE-SAFE*2
 
-    w,h = draw.multiline_textbbox((0,0),text,font=font)[2:]
+    text = wrap(draw,quote,font,maxwidth)
+
+    box = draw.multiline_textbbox((0,0),text,font=font)
+
+    w = box[2]
+    h = box[3]
 
     x = (SIZE-w)/2
     y = (SIZE-h)/2
 
-    glow(draw,(x,y),text,font)
+    glow(draw,x,y,text,font)
 
     draw.multiline_text(
         (x,y),
