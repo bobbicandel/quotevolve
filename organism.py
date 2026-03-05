@@ -2,55 +2,51 @@ import random
 import numpy as np
 from PIL import Image, ImageFilter
 
-
 W = 1200
 H = 1200
 
 
-def cosmic_gradient():
+def gradient():
 
-    base = np.zeros((H, W, 3), dtype=np.float32)
+    img = np.zeros((H, W, 3), dtype=np.float32)
 
     c1 = np.array([
-        random.randint(20,60),
         random.randint(40,90),
-        random.randint(80,160)
+        random.randint(60,120),
+        random.randint(120,200)
     ])
 
     c2 = np.array([
-        random.randint(120,180),
-        random.randint(80,140),
+        random.randint(120,200),
+        random.randint(80,150),
         random.randint(60,120)
     ])
 
     for y in range(H):
 
-        t = y / H
+        ty = y / H
 
-        color = (1-t)*c1 + t*c2
+        for x in range(W):
 
-        base[y,:,:] = color
+            tx = x / W
 
-    return base
+            mix = (tx + ty) / 2
 
+            color = (1-mix)*c1 + mix*c2
 
-def grain_texture(img):
+            img[y,x] = color
 
-    noise = np.random.normal(0, 8, (H, W, 3))
-
-    img = img + noise
-
-    return np.clip(img,0,255)
+    return img
 
 
-def fractal_light(img):
+def plasma(img):
 
-    for _ in range(8):
+    for _ in range(6):
 
         cx = random.randint(0, W)
         cy = random.randint(0, H)
 
-        radius = random.randint(150,400)
+        radius = random.randint(200,500)
 
         for y in range(H):
 
@@ -59,13 +55,22 @@ def fractal_light(img):
                 dx = x - cx
                 dy = y - cy
 
-                d = (dx*dx + dy*dy)**0.5
+                d = (dx*dx + dy*dy) ** 0.5
 
                 if d < radius:
 
-                    glow = (1 - d/radius) * 40
+                    glow = (1 - d/radius) * random.randint(30,60)
 
                     img[y,x] += glow
+
+    return np.clip(img,0,255)
+
+
+def grain(img):
+
+    noise = np.random.normal(0,7,(H,W,3))
+
+    img = img + noise
 
     return np.clip(img,0,255)
 
@@ -92,11 +97,11 @@ def vignette(img):
 
 def generate():
 
-    img = cosmic_gradient()
+    img = gradient()
 
-    img = grain_texture(img)
+    img = plasma(img)
 
-    img = fractal_light(img)
+    img = grain(img)
 
     img = vignette(img)
 
@@ -104,6 +109,6 @@ def generate():
 
     im = Image.fromarray(img)
 
-    im = im.filter(ImageFilter.SMOOTH)
+    im = im.filter(ImageFilter.GaussianBlur(0.6))
 
     return im
