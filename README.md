@@ -1,5 +1,7 @@
 # Islamic Quote Posters
 
+![](poster/24.png)
+
 ![](poster/23.png)
 
 ![](poster/22.png)
