@@ -114,13 +114,13 @@
   <meta name="route-pattern" content="/:user_id/:repository/raw/*name(/*path)" data-turbo-transient>
   <meta name="route-controller" content="blob" data-turbo-transient>
   <meta name="route-action" content="raw" data-turbo-transient>
-  <meta name="fetch-nonce" content="v2:e4cfcba4-1351-6c37-f5eb-b2fc9256fa48">
+  <meta name="fetch-nonce" content="v2:6d99a8d6-e74f-7355-a695-d116c6b89201">
 
     
   <meta name="current-catalog-service-hash" content="f3abb0cc802f3d7b95fc8762b94bdcb13bf39634c40c357301c4aa1d67a256fb">
 
 
-  <meta name="request-id" content="2C11:36CB7F:1AC7642:233AD60:6ACB80A6" data-turbo-transient="true" /><meta name="html-safe-nonce" content="f63126f9ace6f7e55c94881b8a38630c846fa209ee5efc429c2281d375fbeab6" data-turbo-transient="true" /><meta name="visitor-payload" content="eyJyZWZlcnJlciI6bnVsbCwicmVxdWVzdF9pZCI6IjJDMTE6MzZDQjdGOjFBQzc2NDI6MjMzQUQ2MDo2QUNCODBBNiIsInZpc2l0b3JfaWQiOiI5MTkxMTYyNjAwMzcwNjY5MTgiLCJyZWdpb25fZWRnZSI6ImlhZCIsInJlZ2lvbl9yZW5kZXIiOiJjZW50cmFsdXMifQ==" data-turbo-transient="true" /><meta name="visitor-hmac" content="cea2b9c934fe124aa8e9de35088d689b78d3c4962f1dd567316b09a18b76edb0" data-turbo-transient="true" />
+  <meta name="request-id" content="D401:2FBE78:8EFB19:BAAFBC:6ACC0322" data-turbo-transient="true" /><meta name="html-safe-nonce" content="5a242ef9457801eaa00cbaedc7d4f3371976d4093af740c38a33383138bbb6f7" data-turbo-transient="true" /><meta name="visitor-payload" content="eyJyZWZlcnJlciI6bnVsbCwicmVxdWVzdF9pZCI6IkQ0MDE6MkZCRTc4OjhFRkIxOTpCQUFGQkM6NkFDQzAzMjIiLCJ2aXNpdG9yX2lkIjoiMjEzMDYzNDQ4NDQ5OTYxMjQ1MCIsInJlZ2lvbl9lZGdlIjoiaWFkIiwicmVnaW9uX3JlbmRlciI6ImNlbnRyYWx1cyJ9" data-turbo-transient="true" /><meta name="visitor-hmac" content="6ce7b0ce8e428b7a26b0a540cb94310a7ef15fa4467a0aeb887bc8bd0df27880" data-turbo-transient="true" />
 
 
     <meta name="hovercard-subject-tag" content="repository:30675533" data-turbo-transient>
@@ -329,10 +329,10 @@
         <span class="js-stale-session-flash-signed-out" hidden>You signed out in another tab or window. <a class="Link--inTextBlock" href="">Reload</a> to refresh your session.</span>
         <span class="js-stale-session-flash-switched" hidden>You switched accounts on another tab or window. <a class="Link--inTextBlock" href="">Reload</a> to refresh your session.</span>
 
-    <button id="icon-button-a4356cc2-58ca-449c-8736-bcfcd00de5fa" aria-labelledby="tooltip-0d8082ae-71a9-4c14-bb50-e2bd60b224d3" type="button" data-view-component="true" class="Button Button--iconOnly Button--invisible Button--medium flash-close js-flash-close">  <svg aria-hidden="true" data-component="Octicon" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-x Button-visual">
+    <button id="icon-button-2f71dbbc-4688-4c05-babc-5ad624ce6ae9" aria-labelledby="tooltip-0c8a94da-90cc-4b1f-bb88-20431cc66662" type="button" data-view-component="true" class="Button Button--iconOnly Button--invisible Button--medium flash-close js-flash-close">  <svg aria-hidden="true" data-component="Octicon" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-x Button-visual">
     <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"></path>
 </svg>
-</button><tool-tip id="tooltip-0d8082ae-71a9-4c14-bb50-e2bd60b224d3" for="icon-button-a4356cc2-58ca-449c-8736-bcfcd00de5fa" popover="manual" data-direction="s" data-type="label" data-view-component="true" class="sr-only position-absolute">Dismiss alert</tool-tip>
+</button><tool-tip id="tooltip-0c8a94da-90cc-4b1f-bb88-20431cc66662" for="icon-button-2f71dbbc-4688-4c05-babc-5ad624ce6ae9" popover="manual" data-direction="s" data-type="label" data-view-component="true" class="sr-only position-absolute">Dismiss alert</tool-tip>
 
 
   
@@ -462,7 +462,7 @@
     <ghcc-consent id="ghcc" class="position-fixed bottom-0 left-0" style="z-index: 999999"
       data-locale="en"
       data-initial-cookie-consent-allowed=""
-      data-cookie-consent-required="true"
+      data-cookie-consent-required="false"
     ></ghcc-consent>
 
 
